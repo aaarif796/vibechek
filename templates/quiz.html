@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vibe Check</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-200 to-pink-200 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg text-center">
+    <h1 class="text-3xl font-bold mb-6 text-purple-700">Vibe Check</h1>
+
+    <form id="quiz-form" class="space-y-4">
+      <div>
+        <label class="block text-lg font-medium text-gray-700">1. How do you feel this morning?</label>
+        <select name="q1" class="w-full mt-1 border border-gray-300 rounded p-2">
+          <option>Happy</option><option>Meh</option><option>Tired</option><option>Excited</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium text-gray-700">2. Your favorite weekend activity?</label>
+        <select name="q2" class="w-full mt-1 border border-gray-300 rounded p-2">
+          <option>Netflix & Chill</option><option>Partying</option><option>Reading</option><option>Gaming</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium text-gray-700">3. What color feels right today?</label>
+        <select name="q3" class="w-full mt-1 border border-gray-300 rounded p-2">
+          <option>Blue</option><option>Yellow</option><option>Red</option><option>Black</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium text-gray-700">4. Your current energy level?</label>
+        <select name="q4" class="w-full mt-1 border border-gray-300 rounded p-2">
+          <option>Low</option><option>Medium</option><option>High</option><option>Off the charts</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium text-gray-700">5. Pick a song genre:</label>
+        <select name="q5" class="w-full mt-1 border border-gray-300 rounded p-2">
+          <option>Lo-fi</option><option>Pop</option><option>Metal</option><option>Indie</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 mt-4">
+        Submit Vibe 
+      </button>
+    </form>
+
+    <div id="vibe-result" class="mt-6 text-xl font-semibold text-purple-700 hidden"></div>
+  </div>
+
+  <div class="mt-8 w-full max-w-lg bg-white p-4 rounded shadow">
+    <h2 class="text-xl font-bold mb-2 text-gray-700"> Live Vibe Feed</h2>
+    <ul id="results" class="text-gray-600 text-sm space-y-1"></ul>
+  </div>
+
+  <script>
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/results/");
+    const form = document.getElementById("quiz-form");
+    const result = document.getElementById("vibe-result");
+    const resultsList = document.getElementById("results");
+
+    function calculateVibe(data) {
+      let vibeScore = 0;
+
+      if (data.q1 === "Happy" || data.q1 === "Excited") vibeScore += 2;
+      if (data.q2 === "Partying" || data.q2 === "Gaming") vibeScore += 2;
+      if (data.q3 === "Yellow" || data.q3 === "Red") vibeScore += 1;
+      if (data.q4 === "High" || data.q4 === "Off the charts") vibeScore += 2;
+      if (data.q5 === "Pop" || data.q5 === "Indie") vibeScore += 1;
+
+      if (vibeScore >= 7) return "Hype Vibes";
+      if (vibeScore >= 4) return "Chill Vibes";
+      return "Lowkey Mood";
+    }
+
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      const vibe = calculateVibe(data);
+
+      result.innerText = `Your vibe: ${vibe}`;
+      result.classList.remove("hidden");
+
+      socket.send(JSON.stringify({ message: vibe }));
+    };
+
+    socket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      const li = document.createElement("li");
+      li.textContent = data.message;
+      resultsList.appendChild(li);
+    };
+  </script>
+</body>
+</html>
