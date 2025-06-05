@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: vibecheck
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: daphne vibechek.asgi:application
+    plan: free
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: vibechek.settings
