@@ -111,7 +111,8 @@ vibechek/
 
 ## Screenshots
 
-(Add screenshots or demo video link here)
+![image](https://github.com/user-attachments/assets/2eb3d564-c93d-4ade-a589-f45be97cc634)
+
 
 ---
 
