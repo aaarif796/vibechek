@@ -116,12 +116,6 @@ vibechek/
 
 ---
 
-## Contributing
-
-Pull requests are welcome. Fork the repository and submit your improvements.
-
----
-
 ## License
 
 MIT License
